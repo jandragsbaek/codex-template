@@ -9,7 +9,14 @@ We aim to write code that is a pleasure to read.
 
 ## Lint baseline
 
-Start from `rubocop-rails-omakase` and keep overrides minimal. Run via `bin/rubocop` (wired into `bin/ci`).
+Pick one linter and stick with it across the project:
+
+- **rubocop-rails-omakase** — DHH's opinionated config. Minimal, aligned with 37signals. Use for new projects.
+- **StandardRB** — Zero-config Ruby linter. Stricter, no decisions to make. Acceptable alternative.
+
+Do not mix both. The chosen linter runs via `bin/ci` (or `bin/gate`) as a required check.
+
+Whatever the choice: zero violations in CI. No exceptions, no `rubocop:disable` unless justified in a comment.
 
 ## Conditional Returns
 
@@ -82,6 +89,31 @@ end
 # Good
 resources :cards do
   resource :closure
+end
+```
+
+## Nested Controller Naming
+
+When extracting custom actions into resource controllers, follow this naming convention:
+
+**File path:** `app/controllers/<parent>/<resource>_controller.rb`
+**Class name:** `<Parent>::<Resource>Controller`
+**Concern path:** `app/models/<parent>/<concern_name>.rb`
+
+Examples:
+
+| Custom action | Resource controller | Method |
+|---|---|---|
+| `IncidentsController#complete` | `Incidents::CompletionsController` | `#create` |
+| `IncidentsController#reopen` | `Incidents::CompletionsController` | `#destroy` |
+| `TeamsController#update_status` | `Teams::StatusesController` | `#update` |
+| `TeamsController#deactivate` | `Teams::ActivationsController` | `#destroy` |
+| `TeamsController#reactivate` | `Teams::ActivationsController` | `#create` |
+
+**Route pattern:**
+```ruby
+resources :incidents do
+  resource :completion, only: [:create, :destroy]
 end
 ```
 

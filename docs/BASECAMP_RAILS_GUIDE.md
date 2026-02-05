@@ -13,6 +13,7 @@ Short, practical guidelines distilled from Basecamp/37signals open repos (Fizzy,
 - Simple deployables: single-container, single-machine friendly; scale by adding instances.
 - Min deps: prefer Rails built-ins; no extra layers unless justified.
 - Inline edits: prefer Turbo Frames + partial replace over full-page reloads for row-level edits.
+- Real-time: Turbo Streams + ActionCable scoped channels (see `docs/CONCURRENCY.md`).
 
 ## Development workflow (Basecamp-style)
 - Setup via `bin/setup`; use `bin/setup --reset` to wipe/seed.
@@ -29,6 +30,31 @@ Short, practical guidelines distilled from Basecamp/37signals open repos (Fizzy,
 - Fast loop: `bin/rails test`.
 - Full gate: `bin/ci` that runs lint + security + tests.
 - Keep system tests serial/limited; cover behavior with model/controller tests.
+
+## Real-time patterns
+
+Hotwire provides two mechanisms for live updates. Use the right one:
+
+**Turbo Streams (user-initiated):**
+- Model callbacks broadcast via `after_create_commit`, `after_update_commit`
+- Scoped to the acting user's response by default
+- Use `broadcast_*` helpers for multi-user updates
+
+**ActionCable broadcasts (multi-user, event-driven):**
+- Use for updates that all connected users must see immediately
+- Keep broadcast payloads small (render a partial, not a full page)
+- Scope channels to the narrowest context (per-event, per-organization)
+
+**Resilience on unreliable networks:**
+- Assume connections will drop (mobile, festival WiFi, tablets)
+- Turbo handles reconnection automatically — rely on it
+- For critical state, poll or refresh on reconnect rather than trusting the stream was uninterrupted
+- Keep UI functional without WebSockets — real-time is an enhancement, not a requirement
+
+**Concurrency:**
+- Use optimistic locking (`lock_version` column) for records edited by multiple users
+- Broadcast after commit, not during transaction
+- Keep broadcast callbacks thin — delegate to model concerns
 
 ## Deployment posture
 - **Self-host/simple**: ship a Docker image that includes web, jobs, caching, file serving, SSL.

@@ -17,7 +17,7 @@ Rails 8 defaults. No substitutions without justification.
 - **Background jobs:** Solid Queue (database-backed, no Redis)
 - **Caching:** Solid Cache (database-backed, no Redis)
 - **WebSockets:** Solid Cable (database-backed, no Redis)
-- **Database:** SQLite (dev/test), MySQL where parity needed
+- **Database:** SQLite (dev/test/production for single-server deploys). MySQL or PostgreSQL where horizontal scaling or write concurrency demands it. Use Litestream for SQLite production backups.
 - **Deployment:** Kamal or single-container Docker
 - **CSS:** Plain CSS via Propshaft (no Tailwind unless project requires it)
 - **Testing:** Minitest + Fixtures (no RSpec, no FactoryBot)
@@ -72,6 +72,22 @@ test/
 - `app/use_cases/`
 - `app/policies/`
 - `spec/`
+
+## Database Posture
+
+SQLite is the default for all environments including production. This follows 37signals convention.
+
+**When to stay on SQLite:**
+- Single-server deploys
+- Low-to-moderate write concurrency
+- Simplicity is a priority
+
+**When to evaluate MySQL/PostgreSQL:**
+- Multiple application servers need shared database
+- High concurrent write volume (e.g. 50+ simultaneous writers)
+- Features requiring advanced database-specific capabilities (full-text search, JSONB, etc.)
+
+Switching is a business decision, not a technical default. Justify the switch before making it.
 
 ## Nested resource controllers
 

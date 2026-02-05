@@ -18,6 +18,9 @@ summary: "Vanilla Rails principles and testing posture."
 11. **Convention over configuration** — Follow Rails defaults whenever possible
 12. **Authorization in models** — Permission logic lives close to domain, not in policy classes
 13. **Human testing for UI feel** — Automation tests logic, humans test experience
+14. **Fail loudly, recover gracefully** — Raise exceptions for programmer errors. Handle expected failures (network, user input) with clear user feedback. Never swallow exceptions silently. Log everything in production.
+15. **Test state changes deeply, edge cases selectively** — Every model method that changes state gets a test. Every controller action gets an integration test. Edge case tests only for business-critical paths. System tests are smoke tests only.
+16. **Migrations are one-way** — Never modify a shipped migration. Always add, never remove columns in production. Plan data migrations as separate steps from schema migrations.
 
 ---
 
