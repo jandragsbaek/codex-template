@@ -2,6 +2,20 @@
 
 Clean starting point for Codex projects.
 
+## How I use it
+
+- I write long, specific prompts. That works best for me.
+- I specifically use `gpt-5.2-codex high`.
+- I usually end long prompts with `$ask-questions-if-underspecified`.
+- I let it run; it can take a while.
+- When I'm happy, I run the full gate.
+- After that, I invoke `$create-pr`.
+- That gets me a PR on GitHub; automation handles the rest.
+- PR labels flow into the draft release via Release Drafter until I cut a release.
+
+Two small GitHub Action runners handle versioning.
+
+
 ## Docs
 
 - `docs/ARCHITECTURE.md` — Rails-first structure and patterns to avoid. Use when shaping app layout.

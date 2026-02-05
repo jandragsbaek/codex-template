@@ -1,0 +1,66 @@
+---
+name: Specs
+
+"on":
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  actions: write
+  contents: read
+  id-token: write
+
+jobs:
+  test:
+    runs-on: self-hosted
+
+    env:
+      RAILS_ENV: test
+      DISABLE_BOOTSNAP: true
+      DISABLE_BOOTSNAP_LOAD_PATH_CACHE: true
+    steps:
+      - name: Install system packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            libsqlite3-0 libvips curl yamllint
+
+      - name: Install Chrome (for act compatibility)
+        run: |
+          sudo apt-get install -y wget gnupg libnss3 libatk1.0-0 \
+            libatk-bridge2.0-0 libcups2 libxcomposite1 libxdamage1 \
+            libxrandr2 libgbm1 libpango-1.0-0 libcairo2 'libasound2*'
+          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub \
+            | sudo apt-key add -
+          chrome_repo="deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ "
+          chrome_repo="${chrome_repo}stable main"
+          echo "$chrome_repo" \
+            | sudo tee /etc/apt/sources.list.d/google-chrome.list
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+
+      - uses: actions/checkout@v6
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+
+      - name: Lint YAML
+        run: yamllint .
+
+      - name: Create DB
+        run: bin/rails db:create
+
+      - name: Load Schema
+        run: bin/rails db:schema:load
+
+      - name: Run system tests
+        run: bin/rails test:all
+
+#      - uses: qltysh/qlty-action/coverage@v1
+#        with:
+#          oidc: true
+#          files: coverage/coverage.json

@@ -1,0 +1,30 @@
+---
+name-template: 'v$RESOLVED_VERSION 🌈'
+tag-template: 'v$RESOLVED_VERSION'
+categories:
+  - title: '🚀 Features'
+    labels:
+      - 'type/feature'
+  - title: '🐛 Bug Fixes'
+    labels:
+      - 'type/fix'
+  - title: '🧰 Maintenance'
+    label: 'type/chore'
+change-template: '- $TITLE (#$NUMBER)'
+# Add # and @ to disable mentions, and ` to disable code blocks.
+change-title-escapes: '\<*_&'
+version-resolver:
+  major:
+    labels:
+      - 'version:bump-major'
+  minor:
+    labels:
+      - 'version:bump-minor'
+  patch:
+    labels:
+      - 'version:bump-patch'
+  default: patch
+exclude-labels:
+  - 'type/skip-changelog'
+template: |
+  $CHANGES

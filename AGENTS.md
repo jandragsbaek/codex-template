@@ -6,6 +6,7 @@ Work style: telegraph; noun-phrases ok; drop grammar; min tokens.
 ## Agent Protocol
 - Contact: Jan Dragsbaek (@jandragsbaek, jan@dragsbaek.tech).
 - PRs: use `gh pr view/diff` (no URLs). Always add label (`--label type/feature|type/fix|type/chore|type/skip-changelog`).
+- PRs: follow `.github/PULL_REQUEST_TEMPLATE.md`. Apply optional version-bump label when warranted (`version:bump-minor|version:bump-major`).
 - “Make a note” => edit AGENTS.md (shortcut; not a blocker). Ignore `CLAUDE.md`.
 - CI: `gh run list/view` (rerun/fix til green).
 - Commits: Conventional Commits (`feat|fix|refactor|build|ci|chore|docs|style|perf|test`).

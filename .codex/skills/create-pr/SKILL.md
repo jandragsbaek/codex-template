@@ -60,10 +60,11 @@ One-line summary: imperative, concise. Body (if needed): why + risk/impact.
 - `git push -u origin <branch>`
 - If skill invoked: you have permission to open the PR.
 - Read the changes (`git status/diff`, key files) to build a specific PR summary/changes/testing section.
-- Always provide a PR body using the template below.
+- Always provide a PR body using `.github/PULL_REQUEST_TEMPLATE.md`.
   - Prefer: `gh pr create --label <type> --title "<title>" --body-file <(printf "...")`
   - If PR already exists or `--fill` is required: `gh pr edit <number> --body "<body>"`
 - Use `gh pr view/diff` to inspect the PR state/diff.
+ - Consider optional version bump labels (`version:bump-minor|version:bump-major`) based on change impact.
 
 Required labels:
 - `type/feature`
@@ -77,18 +78,21 @@ Required labels:
 - If CI returns qlty feedback, address it, then re-run.
 - Run `bin/ci --no-signoff` before pushing; after push, run `bin/ci`.
 
-## PR Body Template (default)
+## PR Body Template (from `.github/PULL_REQUEST_TEMPLATE.md`)
 
 ```
 ## Summary
 - ...
 
-## Changes
-- ...
+## Label Checklist
 
-## Testing
-- `...`
+**Required** — pick exactly one `type/` label:
+- [ ] `type/feature` — new functionality
+- [ ] `type/fix` — bug fix or correction
+- [ ] `type/chore` — maintenance, refactor, deps
+- [ ] `type/skip-changelog` — docs/CI, no user impact
 
-## Notes
-- ...
+**Optional** — version bump (default: patch):
+- [ ] `version:bump-minor` — new feature (1.0 → 1.1)
+- [ ] `version:bump-major` — breaking change (1.0 → 2.0)
 ```
