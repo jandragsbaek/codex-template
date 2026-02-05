@@ -38,12 +38,15 @@ See `docs/ARCHITECTURE.md` for full details.
 
 ## Skills
 
-- `ask-questions-if-underspecified` — Clarify before implementing
-- `brave-search` — Web search without a browser
+- [`ask-questions-if-underspecified`](https://github.com/trailofbits/skills/tree/main/plugins/ask-questions-if-underspecified) — Clarify before implementing
+- [`brave-search`](https://github.com/steipete/agent-scripts/tree/main/skills/brave-search) — Web search without a browser
 - `create-pr` — Branch, commit, and open a PR
-- `frontend-design` — Distinctive UI generation (no AI slop)
-- `humanizer` — Strip AI writing patterns
+- [`frontend-design`](https://github.com/anthropics/claude-code/tree/main/plugins/frontend-design/skills/frontend-design) — Distinctive UI generation (no AI slop)
+- [`game-changing-features`](https://github.com/softaworks/agent-toolkit/tree/main/skills/game-changing-features)
+- [`humanizer`](https://github.com/softaworks/agent-toolkit/tree/main/skills/humanizer) — Strip AI writing patterns
 - `improve-from-last-day` — Audit recent Codex sessions for doc improvements
+- [seo-audit](https://github.com/coreyhaines31/marketingskills/tree/main/skills/seo-audit) - SEO audit
+- [`ui-ux-pro-max`](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) - UI/UX and design system things
 
 ## Scripts
 
