@@ -56,7 +56,9 @@ Required PR labels -> tests on self-hosted runner -> Release Drafter builds chan
 1. Use this template (or fork)
 2. Update `AGENTS.md` with your contact info and project-specific rules
 3. Customize `docs/` for your domain
-4. Run `rails new .` (with your preferences)
+4. `rails new . --skip-jbuilder`
+
+Rails 8 defaults already include Propshaft, Importmap, and SQLite. See `docs/ARCHITECTURE.md` for stack rationale.
 
 ## Credit
 

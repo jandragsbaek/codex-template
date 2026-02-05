@@ -183,9 +183,9 @@ class CoverageInsights
     if controller_coverage == 0
       actions << {
         priority: 2,
-        action: "Add Request/Controller Specs",
-        reason: "Controllers have 0% coverage",
-        impact: "Medium - Ensures API endpoints work"
+        action: "Add Controller Tests",
+        reason: "Controllers have #{controller_coverage.round(1)}% coverage",
+        impact: "Medium - Ensures endpoints work correctly"
       }
     end
 
