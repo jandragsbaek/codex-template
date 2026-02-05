@@ -45,7 +45,7 @@ See `docs/ARCHITECTURE.md` for full details.
 - [`game-changing-features`](https://github.com/softaworks/agent-toolkit/tree/main/skills/game-changing-features)
 - [`humanizer`](https://github.com/softaworks/agent-toolkit/tree/main/skills/humanizer) — Strip AI writing patterns
 - `improve-from-last-day` — Audit recent Codex sessions for doc improvements
-- [seo-audit](https://github.com/coreyhaines31/marketingskills/tree/main/skills/seo-audit) - SEO audit
+- [`seo-audit`](https://github.com/coreyhaines31/marketingskills/tree/main/skills/seo-audit) - SEO audit
 - [`ui-ux-pro-max`](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) - UI/UX and design system things
 
 ## Scripts
