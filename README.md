@@ -15,6 +15,10 @@ Clean starting point for Codex projects.
 
 Two small GitHub Action runners handle versioning.
 
+## Note
+
+Heavily favors Ruby on Rails 8. Can easily be adjusted to whatever, by slimming down the `docs/` folder and making minor adjustments in `AGENTS.md`.
+
 
 ## Docs
 
