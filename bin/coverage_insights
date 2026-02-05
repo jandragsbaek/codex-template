@@ -1,0 +1,333 @@
+#!/usr/bin/env ruby
+
+require "json"
+require "pathname"
+require "active_support/core_ext/object/blank"
+
+class CoverageInsights
+  CRITICAL_PATHS = %w[
+    app/models
+    app/controllers
+    app/services
+    app/jobs
+  ].freeze
+
+  IMPORTANCE_WEIGHTS = {
+    "app/models" => 10,
+    "app/controllers" => 8,
+    "app/services" => 9,
+    "app/jobs" => 7,
+    "app/helpers" => 4,
+    "app/components" => 5,
+    "lib" => 6
+  }.freeze
+
+  def initialize(coverage_file = "coverage/coverage.json")
+    @coverage_file = coverage_file
+    @coverage_data = load_coverage_data
+    @insights = []
+  end
+
+  def analyze
+    puts "🔍 SimpleCov Coverage Insights"
+    puts "=" * 50
+    puts
+
+    analyze_overall_health
+    puts
+    identify_quick_wins
+    puts
+    find_testing_gaps
+    puts
+    suggest_next_actions
+    puts
+    generate_summary_report
+  end
+
+  private
+
+  def load_coverage_data
+    return {} unless File.exist?(@coverage_file)
+
+    JSON.parse(File.read(@coverage_file))["coverage"]
+  rescue JSON::ParserError => e
+    puts "❌ Error parsing coverage file: #{e.message}"
+    {}
+  end
+
+  def analyze_overall_health
+    puts "🏥 Coverage Health Assessment"
+    puts "-" * 35
+
+    total_files = @coverage_data.size
+    total_lines, covered_lines = calculate_totals
+    overall_coverage = (total_lines > 0) ? (covered_lines.to_f / total_lines * 100) : 0
+
+    # Categorize coverage health
+    health_status = case overall_coverage
+    when 0...30 then {status: "🚨 CRITICAL", color: "red", advice: "Immediate action required"}
+    when 30...60 then {status: "⚠️  POOR", color: "yellow", advice: "Significant improvement needed"}
+    when 60...80 then {status: "📈 FAIR", color: "orange", advice: "Good progress, keep going"}
+    when 80...90 then {status: "✅ GOOD", color: "green", advice: "Almost there!"}
+    else {status: "🎉 EXCELLENT", color: "green", advice: "Maintain this level"}
+    end
+
+    puts "Overall Status: #{health_status[:status]} (#{overall_coverage.round(1)}%)"
+    puts "Advice: #{health_status[:advice]}"
+    puts "Files Analyzed: #{total_files}"
+    puts "Coverage: #{covered_lines}/#{total_lines} lines"
+
+    # Add insight
+    @insights << {
+      type: :health,
+      coverage: overall_coverage,
+      status: health_status[:status],
+      files: total_files
+    }
+  end
+
+  def identify_quick_wins
+    puts "⚡ Quick Wins (Easy Coverage Improvements)"
+    puts "-" * 45
+
+    quick_wins = []
+
+    @coverage_data.each do |file_path, data|
+      lines = data["lines"]
+      next unless lines
+
+      coverage = coverage_percentage(lines)
+      total_lines = lines.count { |line| !line.nil? }
+      uncovered_lines = lines.count { |line| line == 0 }
+
+      # Quick win criteria: small files with 0% coverage or large impact potential
+      if (coverage == 0 && total_lines <= 20) ||
+          (coverage > 0 && coverage < 50 && total_lines <= 30)
+
+        importance = file_importance(file_path)
+        quick_wins << {
+          file: relative_path(file_path),
+          coverage: coverage,
+          lines: total_lines,
+          uncovered: uncovered_lines,
+          importance: importance,
+          impact_score: (importance * uncovered_lines) / total_lines.to_f
+        }
+      end
+    end
+
+    # Sort by impact score (importance * uncovered lines / total lines)
+    quick_wins.sort_by { |win| -win[:impact_score] }.first(5).each do |win|
+      puts "📁 #{win[:file]}"
+      puts "   Coverage: #{win[:coverage].round(1)}% | Lines: #{win[:lines]} | Impact: #{win[:impact_score].round(1)}"
+      puts "   💡 Add #{win[:uncovered]} lines of tests for #{win[:importance]}/10 priority file"
+      puts
+    end
+
+    @insights << {type: :quick_wins, count: quick_wins.size, top_files: quick_wins.first(3)}
+  end
+
+  def find_testing_gaps
+    puts "🕳️  Critical Testing Gaps"
+    puts "-" * 30
+
+    gaps = []
+
+    # Find high-importance files with poor coverage
+    @coverage_data.each do |file_path, data|
+      next unless is_critical_file?(file_path)
+
+      lines = data["lines"]
+      next unless lines
+
+      coverage = coverage_percentage(lines)
+      importance = file_importance(file_path)
+
+      if coverage < 70 && importance >= 8  # High importance, low coverage
+        gaps << {
+          file: relative_path(file_path),
+          coverage: coverage,
+          importance: importance,
+          risk_score: importance * (100 - coverage)
+        }
+      end
+    end
+
+    gaps.sort_by { |gap| -gap[:risk_score] }.first(5).each do |gap|
+      puts "⚠️  #{gap[:file]}"
+      puts "   Coverage: #{gap[:coverage].round(1)}% | Priority: #{gap[:importance]}/10"
+      puts "   🎯 Risk Score: #{gap[:risk_score].round(1)} (high = more critical)"
+      puts
+    end
+
+    @insights << {type: :gaps, count: gaps.size, high_risk: gaps.first(3)}
+  end
+
+  def suggest_next_actions
+    puts "🎯 Recommended Next Actions"
+    puts "-" * 30
+
+    actions = []
+
+    # Analyze patterns and suggest actions
+    model_coverage = calculate_directory_coverage("app/models")
+    controller_coverage = calculate_directory_coverage("app/controllers")
+    service_coverage = calculate_directory_coverage("app/services")
+
+    if model_coverage < 80
+      actions << {
+        priority: 1,
+        action: "Focus on Model Testing",
+        reason: "Models have #{model_coverage.round(1)}% coverage but should be >90%",
+        impact: "High - Models are core business logic"
+      }
+    end
+
+    if controller_coverage == 0
+      actions << {
+        priority: 2,
+        action: "Add Request/Controller Specs",
+        reason: "Controllers have 0% coverage",
+        impact: "Medium - Ensures API endpoints work"
+      }
+    end
+
+    if service_coverage < 70
+      actions << {
+        priority: 3,
+        action: "Test Service Objects",
+        reason: "Services have #{service_coverage.round(1)}% coverage",
+        impact: "High - Services contain complex business logic"
+      }
+    end
+
+    # Add general recommendations
+    total_lines, covered_lines = calculate_totals
+    overall_coverage = (total_lines > 0) ? (covered_lines.to_f / total_lines * 100) : 0
+
+    if overall_coverage < 50
+      actions << {
+        priority: 1,
+        action: "Set Coverage Minimum",
+        reason: "Current coverage is #{overall_coverage.round(1)}%",
+        impact: "Add SimpleCov.minimum_coverage 60 to prevent regression"
+      }
+    end
+
+    actions.sort_by { |a| a[:priority] }.each_with_index do |action, index|
+      puts "#{index + 1}. #{action[:action]}"
+      puts "   Reason: #{action[:reason]}"
+      puts "   Impact: #{action[:impact]}"
+      puts
+    end
+
+    @insights << {type: :actions, recommendations: actions}
+  end
+
+  def generate_summary_report
+    puts "📊 Coverage Summary & Trends"
+    puts "-" * 30
+
+    # Directory breakdown
+    puts "Coverage by Directory:"
+    IMPORTANCE_WEIGHTS.each do |dir, importance|
+      coverage = calculate_directory_coverage(dir)
+      next if coverage < 0
+
+      status_emoji = case coverage
+      when 0...30 then "🔴"
+      when 30...70 then "🟡"
+      when 70...90 then "🟢"
+      else "🎉"
+      end
+
+      puts "  #{status_emoji} #{dir}: #{coverage.round(1)}% (Priority: #{importance}/10)"
+    end
+
+    puts
+    puts "🎯 Coverage Goals:"
+    puts "  • Models: 90%+ (Business Logic)"
+    puts "  • Services: 85%+ (Complex Logic)"
+    puts "  • Controllers: 70%+ (API Coverage)"
+    puts "  • Overall: 80%+ (Industry Standard)"
+
+    # Generate actionable insights summary
+    puts
+    puts "💡 Key Insights:"
+    @insights.size
+    puts "  • Analyzed #{@coverage_data.size} files"
+    puts "  • Found #{@insights.find { |i| i[:type] == :quick_wins }&.dig(:count) || 0} quick win opportunities"
+    puts "  • Identified #{@insights.find { |i| i[:type] == :gaps }&.dig(:count) || 0} critical testing gaps"
+    puts "  • Generated #{@insights.find { |i| i[:type] == :actions }&.dig(:recommendations)&.size || 0} action recommendations"
+  end
+
+  def coverage_percentage(lines)
+    return 0 if lines.blank?
+
+    executable_lines = lines.count { |line| !line.nil? }
+    return 0 if executable_lines == 0
+
+    covered_lines = lines.count { |line| line && line > 0 }
+    (covered_lines.to_f / executable_lines * 100)
+  end
+
+  def calculate_totals
+    total_lines = 0
+    covered_lines = 0
+
+    @coverage_data.each do |_, data|
+      lines = data["lines"]
+      next unless lines
+
+      executable_lines = lines.count { |line| !line.nil? }
+      covered = lines.count { |line| line && line > 0 }
+
+      total_lines += executable_lines
+      covered_lines += covered
+    end
+
+    [total_lines, covered_lines]
+  end
+
+  def calculate_directory_coverage(directory)
+    dir_files = @coverage_data.select { |path, _| path.include?(directory) }
+    return -1 if dir_files.empty?
+
+    total_lines = 0
+    covered_lines = 0
+
+    dir_files.each do |_, data|
+      lines = data["lines"]
+      next unless lines
+
+      executable_lines = lines.count { |line| !line.nil? }
+      covered = lines.count { |line| line && line > 0 }
+
+      total_lines += executable_lines
+      covered_lines += covered
+    end
+
+    (total_lines > 0) ? (covered_lines.to_f / total_lines * 100) : 0
+  end
+
+  def file_importance(file_path)
+    IMPORTANCE_WEIGHTS.each do |path, weight|
+      return weight if file_path.include?(path)
+    end
+    1
+  end
+
+  def is_critical_file?(file_path)
+    CRITICAL_PATHS.any? { |path| file_path.include?(path) }
+  end
+
+  def relative_path(file_path)
+    Pathname.new(file_path).relative_path_from(Pathname.new(Dir.pwd)).to_s
+  end
+end
+
+# Run the analyzer
+if __FILE__ == $0
+  analyzer = CoverageInsights.new
+  analyzer.analyze
+end
