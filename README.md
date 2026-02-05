@@ -27,6 +27,10 @@ See `docs/ARCHITECTURE.md` for full details.
 - `docs/ARCHITECTURE.md` — Rails-first structure and patterns to avoid. Use when shaping app layout.
 - `docs/BASECAMP_RAILS_GUIDE.md` — practical Rails workflow + deploy norms. Use when deciding dev/test/deploy defaults.
 - `docs/CODEX_CLI.md` — where Codex skills/history live. Use when working on agent tooling.
+- `docs/CONCURRENCY.md` — Real-time patterns and concurrent writes. Use when adding ActionCable or Turbo Streams.
+- `docs/ERROR_HANDLING.md` — Exception strategy and resilience. Use when adding rescue blocks or external services.
+- `docs/MULTI_TENANCY.md` — acts_as_tenant patterns. Use when adding models or writing queries.
+- `docs/PERFORMANCE.md` — Query budgets and baselines. Use when optimizing or adding eager loading.
 - `docs/PRINCIPLES.md` — core Rails principles + testing posture. Use for architectural tradeoffs.
 - `docs/STYLE.md` — Ruby style + lint baseline. Use when editing or setting lint rules.
 
