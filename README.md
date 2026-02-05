@@ -19,6 +19,8 @@ See `docs/ARCHITECTURE.md` for full details.
 - Long, specific prompts -> Codex CLI (`gpt-5.2-codex high`)
 - End prompts with `$ask-questions-if-underspecified` when needed
 - Ask codex to run full gate
+- Run `bin/ci` before merging (lint + security + tests + signoff)
+- Use `bin/ci --no-signoff` for local dev
 - Invoke `$create-pr` to open a PR with required labels
 - PR labels flow into Release Drafter -> cut a release when ready
 
@@ -60,9 +62,39 @@ Required PR labels -> tests on self-hosted runner -> Release Drafter builds chan
 1. Use this template (or fork)
 2. Update `AGENTS.md` with your contact info and project-specific rules
 3. Customize `docs/` for your domain
-4. `rails new . --skip-jbuilder`
+4. Generate the Rails app:
+   ```bash
+   rails new . --skip-jbuilder
+   ```
+5. **Restore customized CI gate** — `rails new` overwrites `bin/ci` and `config/ci.rb` with defaults. Replace `config/ci.rb` with the full gate:
+   ```ruby
+   CI.run do
+     skip_signoff = ARGV.include?("--no-signoff")
+     step "Setup", "bin/setup --skip-server"
+     step "Style: Ruby", "bundle exec standardrb"
+     step "Style: YAML", "yamllint ."
+     step "Security: Bundler audit", "bundle exec bundle-audit check --update"
+     step "Security: Brakeman", "bundle exec brakeman --exit-on-warn --no-pager"
+     step "Security: Importmap audit", "bin/importmap audit"
+     step "Tests: All", "bin/rails test:all"
+     if success? && !skip_signoff
+       step "Signoff", "gh signoff"
+     elsif !success?
+       failure "CI failed.", "Fix issues and retry."
+     end
+   end
+   ```
+6. Add security gems to Gemfile:
+   ```ruby
+   gem "standard", require: false
+   group :development, :test do
+     gem "brakeman"
+     gem "bundler-audit"
+   end
+   ```
+7. Run `bundle install && bin/ci --no-signoff` to verify
 
-Rails 8 defaults already include Propshaft, Importmap, and SQLite. See `docs/ARCHITECTURE.md` for stack rationale.
+Rails 8 defaults already include Propshaft, Importmap, Solid Queue/Cache/Cable, and SQLite. See `docs/ARCHITECTURE.md` for stack rationale.
 
 ## Credit
 

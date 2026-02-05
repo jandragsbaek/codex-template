@@ -27,9 +27,18 @@ Short, practical guidelines distilled from Basecamp/37signals open repos (Fizzy,
 - CI should exercise SQLite + MySQL where feasible.
 
 ## Testing + CI
-- Fast loop: `bin/rails test`.
-- Full gate: `bin/ci` that runs lint + security + tests.
+- Fast loop: `bin/rails test`
+- Full CI gate: `bin/ci` — runs in order:
+  1. Setup (bin/setup --skip-server)
+  2. StandardRB (Ruby style)
+  3. yamllint (YAML style)
+  4. bundler-audit (dependency CVEs)
+  5. Brakeman (static security analysis)
+  6. importmap audit (JS dependency security)
+  7. All tests (bin/rails test:all)
+  8. gh signoff (skip with `--no-signoff` for local dev)
 - Keep system tests serial/limited; cover behavior with model/controller tests.
+- CI fails on ANY violation. Zero tolerance.
 
 ## Real-time patterns
 
