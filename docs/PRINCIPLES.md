@@ -12,7 +12,7 @@ summary: "Vanilla Rails principles and testing posture."
 5. **Everything is CRUD** — Create new controllers rather than custom actions
 6. **Minitest + Fixtures** — Fast, simple, built into Rails
 7. **Model and controller tests over system tests** — System tests for smoke tests only
-8. **Database-backed infrastructure** — Solid Queue/Cache/Cable eliminate Redis
+8. **Database-backed infrastructure** — Solid Queue, Solid Cache, Solid Cable eliminate Redis; Propshaft + Importmap eliminate JS bundlers
 9. **Hotwire for interactivity** — HTML over the wire, minimal JavaScript
 10. **Build small things first** — Don't abstract until you have a reason
 11. **Convention over configuration** — Follow Rails defaults whenever possible

@@ -9,6 +9,7 @@ Short, practical guidelines distilled from Basecamp/37signals open repos (Fizzy,
 
 ## Defaults to follow
 - Vanilla Rails first: thin controllers + rich models + RESTful resources (see `docs/PRINCIPLES.md`, `docs/ARCHITECTURE.md`).
+- Stack: Propshaft + Importmap + Solid Queue/Cache/Cable. No Redis in the default stack.
 - Simple deployables: single-container, single-machine friendly; scale by adding instances.
 - Min deps: prefer Rails built-ins; no extra layers unless justified.
 - Inline edits: prefer Turbo Frames + partial replace over full-page reloads for row-level edits.

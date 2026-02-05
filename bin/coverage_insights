@@ -8,17 +8,15 @@ class CoverageInsights
   CRITICAL_PATHS = %w[
     app/models
     app/controllers
-    app/services
     app/jobs
   ].freeze
 
   IMPORTANCE_WEIGHTS = {
     "app/models" => 10,
     "app/controllers" => 8,
-    "app/services" => 9,
     "app/jobs" => 7,
+    "app/mailers" => 5,
     "app/helpers" => 4,
-    "app/components" => 5,
     "lib" => 6
   }.freeze
 
@@ -172,7 +170,6 @@ class CoverageInsights
     # Analyze patterns and suggest actions
     model_coverage = calculate_directory_coverage("app/models")
     controller_coverage = calculate_directory_coverage("app/controllers")
-    service_coverage = calculate_directory_coverage("app/services")
 
     if model_coverage < 80
       actions << {
@@ -189,15 +186,6 @@ class CoverageInsights
         action: "Add Request/Controller Specs",
         reason: "Controllers have 0% coverage",
         impact: "Medium - Ensures API endpoints work"
-      }
-    end
-
-    if service_coverage < 70
-      actions << {
-        priority: 3,
-        action: "Test Service Objects",
-        reason: "Services have #{service_coverage.round(1)}% coverage",
-        impact: "High - Services contain complex business logic"
       }
     end
 
@@ -247,7 +235,7 @@ class CoverageInsights
     puts
     puts "🎯 Coverage Goals:"
     puts "  • Models: 90%+ (Business Logic)"
-    puts "  • Services: 85%+ (Complex Logic)"
+    puts "  • Jobs: 80%+ (Background Processing)"
     puts "  • Controllers: 70%+ (API Coverage)"
     puts "  • Overall: 80%+ (Industry Standard)"
 

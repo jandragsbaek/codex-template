@@ -23,9 +23,9 @@ Systematically scan the last 24 hours of Codex CLI conversations, identify impro
 - Use the script below to extract user + assistant messages from the last 24 hours:
 
 ```bash
-python3 /Users/dragsbaek/src/pje1/.codex/skills/improve-from-last-day/scripts/collect_codex_conversations.py \
+python3 .codex/skills/improve-from-last-day/scripts/collect_codex_conversations.py \
   --since-hours 24 \
-  --out /Users/dragsbaek/src/pje1/tmp/codex-last-24h.txt
+  --out tmp/codex-last-24h.txt
 ```
 
 - If the script fails, inspect a recent session file directly and continue manually.

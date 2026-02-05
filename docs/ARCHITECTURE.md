@@ -7,6 +7,22 @@ summary: "Vanilla Rails directory layout and patterns to avoid."
 
 Vanilla Rails approach: maximize Rails built-ins, minimize dependencies.
 
+## Stack Defaults
+
+Rails 8 defaults. No substitutions without justification.
+
+- **Asset pipeline:** Propshaft (not Sprockets)
+- **JavaScript:** Importmap (no bundler — no esbuild, no webpack, no Vite)
+- **Frontend interactivity:** Hotwire (Turbo + Stimulus)
+- **Background jobs:** Solid Queue (database-backed, no Redis)
+- **Caching:** Solid Cache (database-backed, no Redis)
+- **WebSockets:** Solid Cable (database-backed, no Redis)
+- **Database:** SQLite (dev/test), MySQL where parity needed
+- **Deployment:** Kamal or single-container Docker
+- **CSS:** Plain CSS via Propshaft (no Tailwind unless project requires it)
+- **Testing:** Minitest + Fixtures (no RSpec, no FactoryBot)
+- **Linting:** rubocop-rails-omakase
+
 ## Directory Structure
 
 ```
