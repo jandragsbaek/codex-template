@@ -74,7 +74,7 @@ Required PR labels -> tests on self-hosted runner -> Release Drafter builds chan
    CI.run do
      skip_signoff = ARGV.include?("--no-signoff")
      step "Setup", "bin/setup --skip-server"
-     step "Style: Ruby", "bundle exec standardrb"
+     step "Style: Ruby", "bundle exec rubocop"
      step "Style: YAML", "yamllint ."
      step "Security: Bundler audit", "bundle exec bundle-audit check --update"
      step "Security: Brakeman", "bundle exec brakeman --exit-on-warn --no-pager"
@@ -87,9 +87,9 @@ Required PR labels -> tests on self-hosted runner -> Release Drafter builds chan
      end
    end
    ```
-6. Add security gems to Gemfile:
+6. Add lint + security gems to Gemfile:
    ```ruby
-   gem "standard", require: false
+   gem "rubocop-rails-omakase", require: false
    group :development, :test do
      gem "brakeman"
      gem "bundler-audit"
