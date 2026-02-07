@@ -9,14 +9,9 @@ We aim to write code that is a pleasure to read.
 
 ## Lint baseline
 
-Pick one linter and stick with it across the project:
+Use **rubocop-rails-omakase** across the project. It runs via `bin/ci` (or `bin/gate`) as a required check.
 
-- **rubocop-rails-omakase** — DHH's opinionated config. Minimal, aligned with 37signals. Use for new projects.
-- **StandardRB** — Zero-config Ruby linter. Stricter, no decisions to make. Acceptable alternative.
-
-Do not mix both. The chosen linter runs via `bin/ci` (or `bin/gate`) as a required check.
-
-Whatever the choice: zero violations in CI. No exceptions, no `rubocop:disable` unless justified in a comment.
+Zero violations in CI. No exceptions, no `rubocop:disable` unless justified in a comment.
 
 ## Conditional Returns
 
