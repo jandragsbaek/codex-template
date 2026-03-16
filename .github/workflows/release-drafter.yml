@@ -26,7 +26,7 @@ jobs:
       #    echo "GHE_HOST=${GITHUB_SERVER_URL##https:\/\/}" >> $GITHUB_ENV
 
       # Draft next release notes as PRs merge into "master".
-      - uses: release-drafter/release-drafter@v6
+      - uses: release-drafter/release-drafter@v7
         # (Optional) config name to use, relative to .github/.
         # Default: release-drafter.yml
         # with:
